@@ -9,10 +9,18 @@ node[:deploy].each do |app_name, deploy|
     php composer.phar install --no-dev
     EOH
   end
+  
+  script "set_permissions" do
+    interpreter "bash"
+    user "root"
+    code <<-EOH
+    chmod -R 777 /srv/www/
+    EOH
+  end
 
   template "#{deploy[:deploy_to]}/current/db-connect.php" do
     source "db-connect.php.erb"
-    mode 0777
+    mode 0660
     group deploy[:group]
 
     if platform?("ubuntu")
@@ -32,14 +40,5 @@ node[:deploy].each do |app_name, deploy|
    only_if do
      File.directory?("#{deploy[:deploy_to]}/current")
    end
-  end
-  
-  script "set_permissions" do
-    interpreter "bash"
-    user "root"
-    cwd "#{deploy[:deploy_to]}/current/app"
-    code <<-EOH
-    chmod -R 777 /srv/www/
-    EOH
   end
 end

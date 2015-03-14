@@ -1,28 +1,44 @@
 node[:deploy].each do |app_name, deploy|
-
   script "install_composer" do
     interpreter "bash"
     user "root"
-    cwd "#{deploy[:deploy_to]}/current"
+    cwd "#{deploy[:deploy_to]}/current/vendor/laravel/framework/"
     code <<-EOH
-    curl -sS https://getcomposer.org/installer | php
-    php composer.phar install --no-dev
-    chmod -R 777 /srv/www
+    curl -s https://getcomposer.org/installer | php
+    php composer.phar install
     EOH
   end
-  
-  script "set_permissions_laravel" do
+
+  script "set_permissions" do
     interpreter "bash"
     user "root"
+    cwd "#{deploy[:deploy_to]}/current/app"
     code <<-EOH
-    chmod -R 777 /srv/www/
+    chmod -R 777 storage
     EOH
   end
+
+  template "#{deploy[:deploy_to]}/current/app/config/database.php" do
+    source "database.php.erb"
+    mode 0660
+    group deploy[:group]
+
+    if platform?("ubuntu")
+      owner "www-data"
+    elsif platform?("amazon")   
+      owner "apache"
+    end
   
-  if platform_family?('debian')
-		execute "set permissions for #{deploy[:deploy_to]}/current/app/storage/" do
-		command "sudo chmod 0777 -Rf #{deploy[:deploy_to]}/current/app/storage/"
-	  end
-	end
-  
+
+    variables(
+      :host =>     (deploy[:database][:host] rescue nil),
+      :user =>     (deploy[:database][:username] rescue nil),
+      :password => (deploy[:database][:password] rescue nil),
+      :db =>       (deploy[:database][:database] rescue nil)
+    )
+
+  only_if do
+    File.directory?("#{deploy[:deploy_to]}/current")
+  end
+end
 end

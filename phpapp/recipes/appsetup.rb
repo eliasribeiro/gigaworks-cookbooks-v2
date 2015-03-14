@@ -34,8 +34,7 @@ node[:deploy].each do |app_name, deploy|
    end
   end
   
-  if deploy[:application] == "platform"
-   script "set_permissions" do
+  script "set_permissions" do
     interpreter "bash"
     user "root"
     cwd "#{deploy[:deploy_to]}/current/app"

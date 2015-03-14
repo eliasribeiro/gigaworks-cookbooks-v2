@@ -40,7 +40,7 @@ node[:deploy].each do |app_name, deploy|
     user "root"
     cwd "#{deploy[:deploy_to]}/current/app"
     code <<-EOH
-    chmod -R 777 storage
+    chmod -R 777 /srv/www/aws_app
     EOH
   end
 end

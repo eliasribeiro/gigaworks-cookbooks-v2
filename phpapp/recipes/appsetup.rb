@@ -12,7 +12,7 @@ node[:deploy].each do |app_name, deploy|
 
   template "#{deploy[:deploy_to]}/current/db-connect.php" do
     source "db-connect.php.erb"
-    mode 0770
+    mode 0777
     group deploy[:group]
 
     if platform?("ubuntu")
@@ -32,5 +32,15 @@ node[:deploy].each do |app_name, deploy|
    only_if do
      File.directory?("#{deploy[:deploy_to]}/current")
    end
+  end
+  
+  if deploy[:application] == "platform"
+   script "set_permissions" do
+    interpreter "bash"
+    user "root"
+    cwd "#{deploy[:deploy_to]}/current/app"
+    code <<-EOH
+    chmod -R 777 storage
+    EOH
   end
 end

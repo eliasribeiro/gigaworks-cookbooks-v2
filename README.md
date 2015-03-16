@@ -1,4 +1,5 @@
-AWS OpsWorks Example Cookbooks
+AWS OpsWorks - Gigaworks Cookbook
 ==============================
 
-The *app example cookbooks are used with the AWS OpsWorks [Getting Started Walkthroughs](http://docs.aws.amazon.com/opsworks/latest/userguide/walkthroughs.html).
+Fork do projeto opsworks-example-cookbooks. Adaptação ao framework laravel 4.2.
+- Permissão na pasta.
